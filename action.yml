@@ -23,5 +23,5 @@ outputs:
   analysis:
     description: 'The analysis of the PR from OpenAI.'
 runs:
-  using: 'node18'
+  using: 'node20'
   main: 'dist/index.js'
