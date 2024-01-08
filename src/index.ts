@@ -10,6 +10,9 @@ const prNumber: number = parseInt(core.getInput('PR_NUMBER') || (process.env.PR_
 const org: string = core.getInput('GITHUB_ORG') || (process.env.GITHUB_ORG as string);
 const repo: string = core.getInput('GITHUB_REPOSITORY') || (process.env.GITHUB_REPOSITORY as string);
 
+// We'll need to parse the repo variable to remove the owner and the / from the string
+const repoName = repo.split('/')[1];
+
 async function main() {
   const PR = await getSinglePR(org, repo, prNumber);
   const assertion = await getAssertion(PR?.body ?? '');
