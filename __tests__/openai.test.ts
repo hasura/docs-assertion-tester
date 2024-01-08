@@ -6,7 +6,7 @@ describe('OpenAI Functionality', () => {
     await expect(testConnection()).resolves.toBe(true);
   });
   it('Should be able to generate a prompt using the diff, assertion, and whole file', async () => {
-    const diff: string = await getDiff(262);
+    const diff: string = await getDiff(262, 'hasura', 'v3-docs');
     const assertion: string = 'The documentation is easy to read and understand.';
     const file: string = 'This is a test file.';
     const prompt: string = generatePrompt(diff, assertion, file);
@@ -22,9 +22,9 @@ describe('OpenAI Functionality', () => {
     const prNumber: number = 262;
     const PR = await getSinglePR('hasura', 'v3-docs', prNumber);
     const assertion = await getAssertion(PR?.body || '');
-    const diff: string = await getDiff(prNumber);
+    const diff: string = await getDiff(prNumber, 'hasura', 'v3-docs');
     const changedFiles = getChangedFiles(diff);
-    const file: any = await getFileContent(changedFiles);
+    const file: any = await getFileContent(changedFiles, 'hasura', 'v3-docs');
     const prompt: string = generatePrompt(diff, assertion, file);
     const response = await testAssertion(prompt);
     expect(response).toBeTruthy();

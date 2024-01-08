@@ -21,9 +21,9 @@ async function main() {
     core.setFailed('No assertion found');
     return;
   } else {
-    const diff: string = await getDiff(prNumber);
+    const diff: string = await getDiff(prNumber, org, repoName);
     const changedFiles = getChangedFiles(diff);
-    const file: any = await getFileContent(changedFiles);
+    const file: any = await getFileContent(changedFiles, org, repoName);
     const prompt: string = generatePrompt(diff, assertion, file);
     const rawAnalysis = await testAssertion(prompt);
     const analysis = writeAnalysis(rawAnalysis?.toString() ?? '');

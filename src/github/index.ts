@@ -82,10 +82,10 @@ export const getAssertion = async (description: string): Promise<string | null> 
 };
 
 // If we have a diff_url we can get the diff
-export const getDiff = async (prNumber: number): Promise<string> => {
+export const getDiff = async (prNumber: number, owner: string, repo: string): Promise<string> => {
   const { data: diff } = await github.pulls.get({
-    owner: 'hasura',
-    repo: 'v3-docs',
+    owner,
+    repo,
     pull_number: prNumber,
     mediaType: {
       format: 'diff',
@@ -112,14 +112,14 @@ export const getChangedFiles = (diff: string): string[] => {
 };
 
 // We'll also need to get the whole file using the files changed from
-export async function getFileContent(path: string[]) {
+export async function getFileContent(path: string[], owner: string, repo: string) {
   let content: string = '';
   // loop over the array of files
   for (let i = 0; i < path.length; i++) {
     // get the file content
     const { data }: any = await github.repos.getContent({
-      owner: 'hasura',
-      repo: 'v3-docs',
+      owner,
+      repo,
       path: path[i],
     });
     // decode the file content

@@ -34,17 +34,17 @@ describe('GitHub Functionality', () => {
   });
   it('Should be able to return the diff of a PR', async () => {
     const diffUrl: number = 262;
-    const diff = await getDiff(diffUrl);
+    const diff = await getDiff(diffUrl, 'hasura', 'v3-docs');
     expect(diff).toContain('diff');
   });
   it('Should be able to determine which files were changed in a PR', async () => {
     const diffUrl: number = 262;
-    const diff = await getDiff(diffUrl);
+    const diff = await getDiff(diffUrl, 'hasura', 'v3-docs');
     const files = getChangedFiles(diff);
     expect(files).toContain('docs/ci-cd/projects.mdx');
   });
   it('Should be able to get the contents of a file', async () => {
-    const contents = await getFileContent(['README.md']);
+    const contents = await getFileContent(['README.md'], 'hasura', 'v3-docs');
     expect(contents).toContain('Website');
   });
 });
