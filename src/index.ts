@@ -14,7 +14,7 @@ const repo: string = core.getInput('GITHUB_REPOSITORY') || (process.env.GITHUB_R
 const repoName = repo.split('/')[1];
 
 async function main() {
-  const PR = await getSinglePR(org, repo, prNumber);
+  const PR = await getSinglePR(org, repoName, prNumber);
   const assertion = await getAssertion(PR?.body ?? '');
   if (assertion?.length === 0 || assertion === null) {
     console.log('No assertion found');

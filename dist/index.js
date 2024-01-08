@@ -200,8 +200,10 @@ dotenv_1.default.config();
 const prNumber = parseInt(core.getInput('PR_NUMBER') || process.env.PR_NUMBER);
 const org = core.getInput('GITHUB_ORG') || process.env.GITHUB_ORG;
 const repo = core.getInput('GITHUB_REPOSITORY') || process.env.GITHUB_REPOSITORY;
+// We'll need to parse the repo variable to remove the owner and the / from the string
+const repoName = repo.split('/')[1];
 async function main() {
-    const PR = await (0, github_1.getSinglePR)(org, repo, prNumber);
+    const PR = await (0, github_1.getSinglePR)(org, repoName, prNumber);
     const assertion = await (0, github_1.getAssertion)(PR?.body ?? '');
     if (assertion?.length === 0 || assertion === null) {
         console.log('No assertion found');
