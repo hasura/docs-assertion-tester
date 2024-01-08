@@ -60,7 +60,8 @@ using our handy [GitHub Action](https://github.com/marketplace/actions/comment-p
 Using our `comment-progress` action, the output looks like this after running
 [the sample workflow](/sample/analyze-and-post.yaml) in the `/sample` folder:
 
-<!-- TODO: Add screenshot -->
+<img width="939" alt="Screenshot 2024-01-08 at 10 03 10 AM" src="https://github.com/hasura/docs-assertion-tester/assets/24390149/38ab3115-93b5-4955-a4a1-2cad85a20090">
+
 
 ## Contributing
 
