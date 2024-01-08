@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Docs Assertion Tester
         id: docs_test
-        uses: hasura/docs-assertion-tester@v1.0.6-alpha
+        uses: hasura/docs-assertion-tester@v1.0.0
         with:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
