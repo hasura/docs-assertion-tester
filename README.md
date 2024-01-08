@@ -17,14 +17,15 @@ We recommend storing these in GitHub secrets. You can find instructions on how t
 In any workflow for PRs, add the following step:
 
 ```yaml
-- name: Docs Assertion Tester
-  uses: hasura/docs-assertion-tester@v1
-  with:
-    openai_api_key: ${{ secrets.OPENAI_API_KEY }}
-    github_token: ${{ secrets.GITHUB_TOKEN }}
-    org: ${{ github.repository_owner }}
-    repo: ${{ github.repository }}
-    pr_number: ${{ github.event.number }}
+ - name: Docs Assertion Tester
+    id: docs_test
+    uses: hasura/docs-assertion-tester@v1.0.0
+    with:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      GITHUB_TOKEN: ${{ secrets.TOKEN }}
+      GITHUB_ORG: ${{ github.repository_owner }}
+      GITHUB_REPOSITORY: ${{ github.repository }}
+      PR_NUMBER: ${{ github.event.number }}
 ```
 
 ## Usage
@@ -56,8 +57,8 @@ scope will check the assertions against the entire set of files changed, includi
 Upon completion, the assertion tester will output the analysis in markdown format. You can add a comment to your PR
 using our handy [GitHub Action](https://github.com/marketplace/actions/comment-progress).
 
-Using our `comment-progress` action, the output looks like this after running [the sample workflow](#) in the `/samples`
-folder:
+Using our `comment-progress` action, the output looks like this after running
+[the sample workflow](/sample/analyze-and-post.yaml) in the `/sample` folder:
 
 <!-- TODO: Add screenshot -->
 
