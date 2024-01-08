@@ -1,0 +1,27 @@
+name: 'Docs Assertion Tester'
+description: 'Test user-facing assertions about documentation changes using OpenAI.'
+branding:
+  icon: user-check
+  color: white
+inputs:
+  GITHUB_TOKEN:
+    description: 'GitHub token'
+    required: true
+  OPENAI_API_KEY:
+    description: 'OpenAI API key'
+    required: true
+  GITHUB_ORG:
+    description: 'The owner of the GitHub repository'
+    required: true
+  GITHUB_REPOSITORY:
+    description: 'The name of the GitHub repository'
+    required: true
+  PR_NUMBER:
+    description: 'Pull Request number'
+    required: true
+outputs:
+  analysis:
+    description: 'The analysis of the PR from OpenAI.'
+runs:
+  using: 'node18'
+  main: 'dist/index.js'
