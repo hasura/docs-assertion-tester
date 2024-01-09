@@ -117,7 +117,9 @@ const getDiff = async (prNumber, owner, repo) => {
         },
     });
     // We'll have to convert the diff to a string, then we can return it
-    const diffString = diff.toString();
+    let diffString = diff.toString();
+    // We'll try adding a note here to see if it drives the point home to GPT
+    diffString = `Diff for PR #${prNumber}:\n\n${diffString}`;
     console.log(`✅ Got diff for PR #${prNumber}`);
     return diffString;
 };
@@ -137,19 +139,20 @@ const getChangedFiles = (diff) => {
 exports.getChangedFiles = getChangedFiles;
 // We'll also need to get the whole file using the files changed from
 async function getFileContent(path, owner, repo) {
-    let content = '';
-    // loop over the array of files
+    let content = 'Original files before the PR:\n\n';
     for (let i = 0; i < path.length; i++) {
-        // get the file content
-        const { data } = await exports.github.repos.getContent({
-            owner,
-            repo,
-            path: path[i],
-        });
-        // decode the file content
-        const decodedContent = Buffer.from(data.content, 'base64').toString();
-        // add the decoded content to the content string
-        content += decodedContent;
+        try {
+            const { data } = await exports.github.repos.getContent({
+                owner,
+                repo,
+                path: path[i],
+            });
+            const decodedContent = Buffer.from(data.content, 'base64').toString();
+            content += decodedContent;
+        }
+        catch (error) {
+            console.error(`Skipping new file as it doesn't exist in the trunk yet`);
+        }
     }
     console.log(`✅ Got file(s) contents`);
     return content;
@@ -270,7 +273,7 @@ const openai = new openAi({
 });
 // This wil generate our prompt using the diff, assertion, and whole file
 const generatePrompt = (diff, assertion, file) => {
-    const comboPrompt = `As a senior engineer, you're tasked with reviewing a documentation PR. Your review will be conducted through two distinct lenses, both centered around an assertion related to usability. The first lens will focus on examining the diff itself — providing targeted feedback on what the PR author actually contributed. The second lens will compare the diff to the entire set of changed files, assessing how the contribution fits within the larger context in relation to the usability assertion. For each lens, provide feedback and determine if the usability assertion is satisfied. You should speak directly to the author and refer to them in second person. Your output should be a JSON-formatted array with two objects and not be wrapped in backticks with the json declaration. Each object should contain the following properties: 'satisfied' (either a ✅ or ❌ to indicate if the assertion is met), 'scope' (either 'Diff' or 'Integrated'), and 'feedback' (a string providing your targeted feedback for that lens). Here's the assertion: ${assertion}\n\nHere's the diff:\n\n${diff}\n\nHere's the whole files:\n\n${file}\n\n`;
+    const comboPrompt = `As a senior engineer, you're tasked with reviewing a documentation PR. Your review will be conducted through two distinct lenses, both centered around an assertion related to usability. The first lens will focus on examining the diff itself — providing targeted feedback on what the PR author actually contributed. The second lens will compare the diff to the entire set of changed files, assessing how the contribution fits within the larger context in relation to the usability assertion. For each lens, provide feedback and determine if the usability assertion is satisfied. You should speak directly to the author and refer to them in second person. Your output should be a JSON-formatted array with two objects. Each object should contain the following properties: 'satisfied' (either a ✅ or ❌ to indicate if the assertion is met), 'scope' (either 'Diff' or 'Integrated'), and 'feedback' (a string providing your targeted feedback for that lens). Here's the assertion: ${assertion}\n\nHere's the diff:\n\n${diff}\n\nHere's the original files:\n\n${file}\n\nBear in mind that some of the files may have been renamed. Remember, do not wrap the JSON in a code block.`;
     return comboPrompt;
 };
 exports.generatePrompt = generatePrompt;
@@ -312,6 +315,9 @@ const testAssertion = async (prompt) => {
 exports.testAssertion = testAssertion;
 // We decided to send things back as JSON so we can manipulate the data in the response we'll be sending back to GitHub
 const writeAnalysis = (analysis) => {
+    // We've still got to double-check because ChatGPT will sometimes return a string that's not valid JSON by wrapping it in code blocks
+    const regex = /^```(json)?/gm;
+    analysis = analysis.replace(regex, '');
     const analysisJSON = JSON.parse(analysis);
     let message = `## DX: Assertion Testing\n\n`;
     const feedback = analysisJSON.map((item) => {

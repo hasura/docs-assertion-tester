@@ -93,7 +93,9 @@ export const getDiff = async (prNumber: number, owner: string, repo: string): Pr
   });
 
   // We'll have to convert the diff to a string, then we can return it
-  const diffString = diff.toString();
+  let diffString = diff.toString();
+  // We'll try adding a note here to see if it drives the point home to GPT
+  diffString = `Diff for PR #${prNumber}:\n\n${diffString}`;
   console.log(`✅ Got diff for PR #${prNumber}`);
   return diffString;
 };
@@ -113,19 +115,19 @@ export const getChangedFiles = (diff: string): string[] => {
 
 // We'll also need to get the whole file using the files changed from
 export async function getFileContent(path: string[], owner: string, repo: string) {
-  let content: string = '';
-  // loop over the array of files
+  let content: string = 'Original files before the PR:\n\n';
   for (let i = 0; i < path.length; i++) {
-    // get the file content
-    const { data }: any = await github.repos.getContent({
-      owner,
-      repo,
-      path: path[i],
-    });
-    // decode the file content
-    const decodedContent = Buffer.from(data.content, 'base64').toString();
-    // add the decoded content to the content string
-    content += decodedContent;
+    try {
+      const { data }: any = await github.repos.getContent({
+        owner,
+        repo,
+        path: path[i],
+      });
+      const decodedContent = Buffer.from(data.content, 'base64').toString();
+      content += decodedContent;
+    } catch (error) {
+      console.error(`Skipping new file as it doesn't exist in the trunk yet`);
+    }
   }
   console.log(`✅ Got file(s) contents`);
   return content;
