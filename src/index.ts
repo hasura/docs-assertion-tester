@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import * as core from '@actions/core';
 import { getSinglePR, getAssertion, getDiff, getChangedFiles, getFileContent } from './github';
-import { generatePrompt, testAssertion, writeAnalysis } from './open_ai';
+import { generatePrompt, testAssertion, writeAnalysis, openAiFeedback } from './open_ai';
 
 dotenv.config();
 
@@ -26,7 +26,7 @@ async function main() {
     const file: any = await getFileContent(changedFiles, org, repoName);
     const prompt: string = generatePrompt(diff, assertion, file);
     const rawAnalysis = await testAssertion(prompt);
-    const analysis = writeAnalysis(rawAnalysis?.toString() ?? '');
+    const analysis = writeAnalysis(rawAnalysis);
     console.log(analysis);
     core.setOutput('analysis', analysis);
     return analysis;

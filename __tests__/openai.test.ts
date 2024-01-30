@@ -1,4 +1,4 @@
-import { testConnection, generatePrompt, testAssertion, writeAnalysis } from '../src/open_ai';
+import { testConnection, generatePrompt, testAssertion, writeAnalysis, openAiFeedback } from '../src/open_ai';
 import { getDiff, getSinglePR, getAssertion, getChangedFiles, getFileContent } from '../src/github';
 
 describe('OpenAI Functionality', () => {
@@ -27,13 +27,16 @@ describe('OpenAI Functionality', () => {
     const file: any = await getFileContent(changedFiles, 'hasura', 'v3-docs');
     const prompt: string = generatePrompt(diff, assertion, file);
     const response = await testAssertion(prompt);
+    console.log(response);
     expect(response).toBeTruthy();
-  }, 50000);
+  }, 100000);
   it('Should create a nicely formatted message using the response', async () => {
-    expect(
-      writeAnalysis(
-        `[{"satisfied": "\u2705", "scope": "diff", "feedback": "You did a great job!"}, {"satisfied": "\u2705", "scope": "wholeFile", "feedback": "Look. At. You. Go!"}]`
-      )
-    ).toContain('You did a great job!');
+    const feedback: openAiFeedback = {
+      feedback: [
+        { satisfied: '\u2705', scope: 'Diff', feedback: 'You did a great job!' },
+        { satisfied: '\u2705', scope: 'Integrated', feedback: 'Look. At. You. Go!' },
+      ],
+    };
+    expect(writeAnalysis(feedback)).toContain('You did a great job!');
   });
 });
