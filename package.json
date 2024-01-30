@@ -7,6 +7,7 @@
     "build": "tsc && ncc build dist/index.js -o dist",
     "watch": "tsc -w & nodemon --no-deprecation dist/index.js",
     "test": "jest --watchAll --verbose --silent",
+    "test-loud": "jest --watchAll --verbose",
     "start": "node --no-deprecation dist/index.js"
   },
   "keywords": [],
